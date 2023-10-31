@@ -27,3 +27,10 @@ jobs:
 
       - name: Maven Test
         run: ./mvnw test
+      
+      - name: Save AppMaps
+        uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: ./tmp/appmap
+          key: appmaps-${{ github.sha }}-${{ github.run_attempt }}
