@@ -12,6 +12,8 @@ jobs:
       - run: 'sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose'
       
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
