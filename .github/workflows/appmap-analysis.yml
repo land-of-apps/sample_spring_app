@@ -1,0 +1,70 @@
+name: AppMap
+
+on:
+  # Run on pull request, so that the PR can be analyzed.
+  pull_request:
+
+  # Run on merge to the base branch, so that the baseline
+  # AppMap archive can be brought up-to-date.
+  # If your base branch is not 'main', (e.g. 'master', 'develop'),
+  # change this accordingly.
+  push:
+    branches:
+      - main
+
+  # Run weekly, so that the baseline AppMap artifact does not expire.
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  # Read the baseline artifact in order to perform
+  # the AppMap comparison.
+  actions: read
+
+  # Commit the AppMap configuration.
+  # If the EndBug/add-and-commit is removed,
+  # this can be changed to 'read'.
+  contents: write
+
+  # Add check annotations to the source code when
+  # a problem is detected.
+  checks: write
+
+  # Add a comment to the pull request.
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'wget https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-linux-x86_64'
+      - run: 'sudo mv docker-compose-linux-x86_64 /usr/libexec/docker/cli-plugins/docker-compose'
+      - run: 'sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose'
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: maven
+
+      - name: Install AppMap tools
+        id: install-appmap
+        uses: getappmap/install-action@v1
+        with:
+          project-type: maven
+          build-patch-file: false
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+
+      - name: Maven Test
+        run: ./mvnw test
+
+      - name: Archive AppMaps
+        uses: getappmap/archive-action@v1
+        with:
+          revision: ${{ github.event.pull_request.base.sha }}
