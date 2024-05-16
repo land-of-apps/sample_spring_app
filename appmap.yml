@@ -1,0 +1,5 @@
+language: "java"
+name: "sample_spring_app"
+appmap_dir: "tmp/appmap"
+packages:
+- path: "org.springframework.samples.petclinic"
