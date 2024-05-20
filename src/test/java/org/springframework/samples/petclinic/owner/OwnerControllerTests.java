@@ -24,11 +24,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -102,6 +104,7 @@ class OwnerControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/new"))
@@ -110,6 +113,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
@@ -117,14 +121,19 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "01316761638"))
+				.param("telephone", "01316761638")
+				.with(csrf()))
 			.andExpect(status().is3xxRedirection());
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
+			.perform(post("/owners/new").param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("city", "London")
+				.with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", "address"))
@@ -132,6 +141,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testInitFindForm() throws Exception {
 		mockMvc.perform(get("/owners/find"))
@@ -140,6 +150,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/findOwners"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormSuccess() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList(george(), new Owner()));
@@ -147,6 +158,7 @@ class OwnerControllerTests {
 		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormByLastName() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList(george()));
@@ -156,6 +168,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormNoOwnersFound() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList());
@@ -168,6 +181,7 @@ class OwnerControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testInitUpdateOwnerForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
@@ -181,6 +195,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateOwnerFormSuccess() throws Exception {
 		mockMvc
@@ -188,25 +203,29 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "01616291589"))
+				.param("telephone", "01616291589")
+				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateOwnerFormUnchangedSuccess() throws Exception {
-		mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID))
+		mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateOwnerFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
 				.param("lastName", "Bloggs")
 				.param("address", "")
-				.param("telephone", ""))
+				.param("telephone", "")
+				.with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeHasErrors("owner"))
 			.andExpect(model().attributeHasFieldErrors("owner", "address"))
@@ -214,6 +233,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testShowOwner() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))

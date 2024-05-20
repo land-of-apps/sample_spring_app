@@ -17,6 +17,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -31,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Test class for {@link VisitController}
@@ -61,6 +63,7 @@ class VisitControllerTests {
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(owner);
 	}
 
+	@WithMockUser
 	@Test
 	void testInitNewVisitForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
@@ -68,21 +71,25 @@ class VisitControllerTests {
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessNewVisitFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
 				.param("name", "George")
-				.param("description", "Visit Description"))
+				.param("description", "Visit Description")
+				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessNewVisitFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID).param("name",
-					"George"))
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "George")
+				.with(csrf()))
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
