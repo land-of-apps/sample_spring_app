@@ -14,7 +14,10 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+		http.authorizeRequests(authorizeRequests -> authorizeRequests.requestMatchers("/login")
+			.permitAll()
+			.anyRequest()
+			.authenticated())
 			.formLogin(formLogin -> formLogin.loginPage("/login").permitAll().defaultSuccessUrl("/", true))
 			.logout(logout -> logout.permitAll());
 
