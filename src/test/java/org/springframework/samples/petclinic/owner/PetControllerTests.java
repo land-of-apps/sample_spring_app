@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -79,21 +80,25 @@ class PetControllerTests {
 			.andExpect(model().attributeExists("pet"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
 				.param("type", "hamster")
-				.param("birthDate", "2015-02-12"))
+				.param("birthDate", "2015-02-12")
+				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
-				.param("birthDate", "2015-02-12"))
+				.param("birthDate", "2015-02-12")
+				.with(csrf()))
 			.andExpect(model().attributeHasNoErrors("owner"))
 			.andExpect(model().attributeHasErrors("pet"))
 			.andExpect(model().attributeHasFieldErrors("pet", "type"))
@@ -111,21 +116,25 @@ class PetControllerTests {
 			.andExpect(view().name("pets/createOrUpdatePetForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateFormSuccess() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "Betty")
 				.param("type", "hamster")
-				.param("birthDate", "2015-02-12"))
+				.param("birthDate", "2015-02-12")
+				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "Betty")
-				.param("birthDate", "2015/02/12"))
+				.param("birthDate", "2015/02/12")
+				.with(csrf()))
 			.andExpect(model().attributeHasNoErrors("owner"))
 			.andExpect(model().attributeHasErrors("pet"))
 			.andExpect(status().isOk())
