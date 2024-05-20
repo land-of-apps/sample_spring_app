@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -102,6 +103,7 @@ class OwnerControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/new"))
@@ -132,6 +134,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testInitFindForm() throws Exception {
 		mockMvc.perform(get("/owners/find"))
@@ -140,6 +143,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/findOwners"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormSuccess() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList(george(), new Owner()));
@@ -147,6 +151,7 @@ class OwnerControllerTests {
 		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormByLastName() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList(george()));
@@ -156,6 +161,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessFindFormNoOwnersFound() throws Exception {
 		Page<Owner> tasks = new PageImpl<Owner>(Lists.newArrayList());
@@ -168,6 +174,7 @@ class OwnerControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testInitUpdateOwnerForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
@@ -181,6 +188,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testProcessUpdateOwnerFormSuccess() throws Exception {
 		mockMvc
@@ -214,6 +222,7 @@ class OwnerControllerTests {
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testShowOwner() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))

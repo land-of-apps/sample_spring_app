@@ -31,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Test class for {@link VisitController}
@@ -61,6 +62,7 @@ class VisitControllerTests {
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(owner);
 	}
 
+	@WithMockUser
 	@Test
 	void testInitNewVisitForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))

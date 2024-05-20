@@ -27,6 +27,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -69,6 +70,7 @@ class PetControllerTests {
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(owner);
 	}
 
+	@WithMockUser
 	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
@@ -100,6 +102,7 @@ class PetControllerTests {
 			.andExpect(view().name("pets/createOrUpdatePetForm"));
 	}
 
+	@WithMockUser
 	@Test
 	void testInitUpdateForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
