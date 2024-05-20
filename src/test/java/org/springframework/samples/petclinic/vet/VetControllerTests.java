@@ -30,6 +30,7 @@ import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -79,6 +80,7 @@ class VetControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testShowVetListHtml() throws Exception {
 
@@ -89,6 +91,7 @@ class VetControllerTests {
 
 	}
 
+	@WithMockUser
 	@Test
 	void testShowResourcesVetList() throws Exception {
 		ResultActions actions = mockMvc.perform(get("/vets").accept(MediaType.APPLICATION_JSON))
